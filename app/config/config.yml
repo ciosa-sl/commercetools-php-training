@@ -75,3 +75,7 @@ commercetools:
     client_id: "%env(CTP_CLIENT_ID)%"
     client_secret: "%env(CTP_CLIENT_SECRET)%"
     project: "%env(CTP_PROJECT)%"
+  facets:
+    size:
+      field: commonSize
+    color: ~

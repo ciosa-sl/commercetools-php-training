@@ -8,6 +8,7 @@ namespace Commercetools\TrainingBundle\Service;
 use Commercetools\Core\Client;
 use Commercetools\Core\Model\Product\ProductProjection;
 use Commercetools\Core\Model\Product\ProductProjectionCollection;
+use Commercetools\Core\Request\Products\ProductProjectionByIdGetRequest;
 use Commercetools\Core\Request\Products\ProductProjectionSearchRequest;
 use Commercetools\Core\Response\PagedSearchResponse;
 use Commercetools\Symfony\CtpBundle\Model\Search;
@@ -31,7 +32,14 @@ class ProductRepository
      */
     public function getProducts(Request $request = null)
     {
-        return null;
+        $searchRequest = ProductProjectionSearchRequest::of();
+        if (!is_null($request)) {
+            $uri = new Uri($request->getRequestUri());
+            $searchRequest = $this->getSearchRequest($searchRequest, $uri);
+        }
+        $response = $this->client->execute($searchRequest);
+
+        return $response;
     }
 
 
@@ -41,7 +49,10 @@ class ProductRepository
      */
     public function getProductById($productId)
     {
-        return null;
+        $request = ProductProjectionByIdGetRequest::ofId($productId);
+        $response = $this->client->execute($request);
+        $product = $request->mapFromResponse($response);
+        return $product;
     }
 
     /**
@@ -51,6 +62,11 @@ class ProductRepository
      */
     public function getSearchRequest(ProductProjectionSearchRequest $request, Uri $uri)
     {
-        return null;
+        $searchValues = [];
+        if (!is_null($request)) {
+            $searchValues = $this->searchModel->getSelectedValues($uri);
+        }
+
+        return $this->searchModel->addFacets($request, $searchValues);
     }
 }

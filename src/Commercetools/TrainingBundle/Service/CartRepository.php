@@ -8,6 +8,15 @@ namespace Commercetools\TrainingBundle\Service;
 use Commercetools\Core\Client;
 use Commercetools\Core\Model\Cart\Cart;
 use Commercetools\Core\Model\Cart\CartDraft;
+use Commercetools\Core\Model\Common\Address;
+use Commercetools\Core\Model\CustomField\CustomFieldObject;
+use Commercetools\Core\Model\CustomField\CustomFieldObjectDraft;
+use Commercetools\Core\Request\Carts\CartByIdGetRequest;
+use Commercetools\Core\Request\Carts\CartCreateRequest;
+use Commercetools\Core\Request\Carts\CartUpdateRequest;
+use Commercetools\Core\Request\Carts\Command\CartAddLineItemAction;
+use Commercetools\Core\Request\Carts\Command\CartChangeLineItemQuantityAction;
+use Commercetools\Core\Request\Carts\Command\CartRemoveLineItemAction;
 
 class CartRepository
 {
@@ -26,7 +35,10 @@ class CartRepository
      */
     public function createCart(CartDraft $cartDraft)
     {
-        return null;
+        $request = CartCreateRequest::ofDraft($cartDraft);
+        $response = $this->client->execute($request);
+        $cart = $request->mapFromResponse($response);
+        return $cart;
     }
 
     /**
@@ -38,7 +50,12 @@ class CartRepository
      */
     public function addLineItem(Cart $cart, $productId, $variantId, $quantity)
     {
-        return null;
+        $request = CartUpdateRequest::ofIdAndVersion($cart->getId(), $cart->getVersion());
+        $request->addAction(CartAddLineItemAction::ofProductIdVariantIdAndQuantity($productId, $variantId, $quantity));
+
+        $response = $this->client->execute($request);
+        $cart = $request->mapFromResponse($response);
+        return $cart;
     }
 
     /**
@@ -49,7 +66,12 @@ class CartRepository
      */
     public function changeLineItemQuantity(Cart $cart, $lineItemId, $quantity)
     {
-        return null;
+        $request = CartUpdateRequest::ofIdAndVersion($cart->getId(), $cart->getVersion());
+        $request->addAction(CartChangeLineItemQuantityAction::ofLineItemIdAndQuantity($lineItemId, $quantity));
+
+        $response = $this->client->execute($request);
+        $cart = $request->mapFromResponse($response);
+        return $cart;
     }
 
     /**
@@ -59,7 +81,12 @@ class CartRepository
      */
     public function removeLineItem(Cart $cart, $lineItemId)
     {
-        return null;
+        $request = CartUpdateRequest::ofIdAndVersion($cart->getId(), $cart->getVersion());
+        $request->addAction(CartRemoveLineItemAction::ofLineItemId($lineItemId));
+
+        $response = $this->client->execute($request);
+        $cart = $request->mapFromResponse($response);
+        return $cart;
     }
 
     /**
@@ -68,7 +95,10 @@ class CartRepository
      */
     public function getCart($cartId)
     {
-        return null;
+        $request = CartByIdGetRequest::ofId($cartId);
+        $response = $this->client->execute($request);
+        $cart = $request->mapFromResponse($response);
+        return $cart;
     }
 
     /**
@@ -77,6 +107,19 @@ class CartRepository
      */
     public function getOrCreateCart($cartId = null)
     {
-        return null;
+        if (is_null($cartId)) {
+            $cartDraft = CartDraft::ofCurrency('EUR')
+                ->setShippingAddress(Address::of()->setCountry('DE'))
+                ->setCustom(CustomFieldObjectDraft::ofTypeKey('CheckReserve'));
+            ;
+            $cart = $this->createCart($cartDraft);
+        } else {
+            $cart = $this->getCart($cartId);
+        }
+        if (is_null($cart)) {
+            $cart = Cart::of();
+        }
+
+        return $cart;
     }
 }

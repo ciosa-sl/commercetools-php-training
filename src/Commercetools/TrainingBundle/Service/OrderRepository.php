@@ -9,6 +9,8 @@ use Commercetools\Core\Client;
 use Commercetools\Core\Model\Cart\Cart;
 use Commercetools\Core\Model\Order\ImportOrder;
 use Commercetools\Core\Model\Order\Order;
+use Commercetools\Core\Request\Orders\OrderCreateFromCartRequest;
+use Commercetools\Core\Request\Orders\OrderImportRequest;
 
 class OrderRepository
 {
@@ -27,7 +29,10 @@ class OrderRepository
      */
     public function importOrder(ImportOrder $importOrder)
     {
-        return null;
+        $request = OrderImportRequest::ofImportOrder($importOrder);
+        $response = $this->client->execute($request);
+        $order = $request->mapFromResponse($response);
+        return $order;
     }
 
     /**
@@ -36,6 +41,9 @@ class OrderRepository
      */
     public function createOrder(Cart $cart)
     {
-        return null;
+        $request = OrderCreateFromCartRequest::ofCartIdAndVersion($cart->getId(), $cart->getVersion());
+        $response = $this->client->execute($request);
+        $order = $request->mapFromResponse($response);
+        return $order;
     }
 }
