@@ -13,8 +13,9 @@ security:
     main:
       anonymous: ~
       commercetools-login:
-        login_path: training_login_route
+        login_path: training_login
         check_path: training_login_check
+        default_target_path: _ctp_training_index
       logout:
         path:   training_logout
         target: _ctp_training_index

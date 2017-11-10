@@ -5,9 +5,10 @@
 
 namespace Commercetools\TrainingBundle\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
-class TrainingTestCase extends \PHPUnit_Framework_TestCase
+class TrainingTestCase extends TestCase
 {
     /**
      * @var Container
